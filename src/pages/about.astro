@@ -61,12 +61,19 @@ const socials = siteConfig.socialLinks.filter((s) => s.href)
       {
         siteConfig.email && (
           <li>
-            <a href={`mailto:${siteConfig.email}`} class="nav-link inline-flex items-baseline gap-3">
-              <span class="text-muted text-xs tracking-widest uppercase w-20 shrink-0">email</span>
+            <button
+              type="button"
+              data-copy-email={siteConfig.email}
+              class="nav-link inline-flex items-baseline gap-3 cursor-pointer text-left bg-transparent border-0 p-0"
+              aria-label={`${siteConfig.email} をコピー`}
+            >
+              <span class="text-muted text-xs tracking-widest uppercase w-20 shrink-0" data-copy-label>
+                email
+              </span>
               <span class="border-b border-current !border-op-30 hover:!border-op-70 transition-[border-color]">
                 {siteConfig.email}
               </span>
-            </a>
+            </button>
           </li>
         )
       }
@@ -79,3 +86,40 @@ const socials = siteConfig.socialLinks.filter((s) => s.href)
     <span class="h-px w-12 bg-current"></span>
   </div>
 </BaseLayout>
+
+<script is:inline>
+  ;(function () {
+    function init() {
+      document.querySelectorAll('[data-copy-email]').forEach((btn) => {
+        const label = btn.querySelector('[data-copy-label]')
+        if (!label) {
+          return
+        }
+        const original = label.textContent.trim()
+        btn.addEventListener('click', () => {
+          const email = btn.getAttribute('data-copy-email') || ''
+          navigator.clipboard
+            .writeText(email)
+            .then(() => {
+              label.textContent = 'copied'
+            })
+            .catch(() => {
+              label.textContent = 'error'
+            })
+            .finally(() => {
+              setTimeout(() => {
+                label.textContent = original
+              }, 1500)
+            })
+        })
+      })
+    }
+
+    document.addEventListener('astro:page-load', init)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init)
+      return
+    }
+    init()
+  })()
+</script>
