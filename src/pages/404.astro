@@ -1,0 +1,19 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+---
+
+<BaseLayout title="not found" description="ページが見つかりませんでした">
+  <div class="flex flex-col items-center justify-center min-h-[50vh] text-center">
+    <p class="text-xs tracking-[0.4em] uppercase text-muted mb-6">404</p>
+    <h1 class="text-2xl font-500 tracking-wide leading-relaxed mb-4">page not found</h1>
+    <p class="text-sm text-muted leading-relaxed mb-12 max-w-md">
+      お探しのページは、移動したか削除された可能性があります。
+    </p>
+    <a
+      href="/"
+      class="text-sm tracking-wider nav-link border-b border-current !border-op-30 hover:!border-op-70 transition-[border-color] pb-1"
+    >
+      ホームへもどる
+    </a>
+  </div>
+</BaseLayout>
