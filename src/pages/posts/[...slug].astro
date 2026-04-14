@@ -356,12 +356,14 @@ function isoDate(d: string) {
 
 <style is:global>
   .gallery {
-    column-count: 1;
-    column-gap: 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    align-items: start;
   }
   @media (min-width: 640px) {
     .gallery {
-      column-count: 2;
+      grid-template-columns: 1fr 1fr;
     }
   }
   @media (min-width: 768px) {
@@ -378,9 +380,8 @@ function isoDate(d: string) {
   }
   .gallery .gallery-item {
     display: block;
-    margin: 0 0 0.5rem !important;
+    margin: 0 !important;
     padding: 0 !important;
-    break-inside: avoid;
     border: 0 !important;
     text-decoration: none !important;
     transition: opacity 0.25s ease;
