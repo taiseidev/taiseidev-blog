@@ -365,6 +365,11 @@ function isoDate(d: string) {
     .gallery {
       grid-template-columns: 1fr 1fr;
     }
+    .gallery .gallery-item:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: calc(50% - 0.25rem);
+    }
   }
   @media (min-width: 768px) {
     .gallery {
