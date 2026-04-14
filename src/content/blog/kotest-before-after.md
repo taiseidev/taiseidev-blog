@@ -9,7 +9,7 @@ category: tech
 tag: Kotlin,Kotest,自動テスト
 image:
   src: "/ogp/kotest-before-after.png"
-  alt: "kotest-before-after`"
+  alt: "kotest-before-after"
 ---
 
 ## はじめに

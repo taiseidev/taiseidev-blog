@@ -47,13 +47,7 @@ Riverpod2.0をキャッチアップはまだだよ〜って方にも読んでい
 
 では、解説していきます🚀
 
-## 目次
-
-[1.Riverpodの概要](https://qiita.com/drafts/4c9d9572a56051a1d51f/edit#riverpod%E3%81%AE%E6%A6%82%E8%A6%81)<br>
-[2.実際に使ってみよう](https://qiita.com/drafts/4c9d9572a56051a1d51f/edit#%E5%AE%9F%E9%9A%9B%E3%81%AB%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%88%E3%81%86)<br>
-[3.Riverpod2.0](https://qiita.com/drafts/4c9d9572a56051a1d51f/edit#riverpod20)
-
-# Riverpodの概要
+## Riverpodの概要
 
 Riverpodとは、状態管理パッケージとして主流だったProviderパッケージを進化させる形で開発された、リアクティブなキャッシュとデータバインディングの状態管理パッケージです。
 
@@ -97,7 +91,7 @@ Riverpodは複数のパッケージがあり、それぞれ用途が異なりま
 |---|---|---|
 |Flutterのみ  |[flutter_riverpod](https://pub.dev/packages/flutter_riverpod)  |FlutterアプリでRiverpodを使用する場合の基本パッケージ  |
 |Flutter + [flutter_hooks](https://github.com/rrousselGit/flutter_hooks)  |[hooks_riverpod](https://pub.dev/packages/hooks_riverpod)  |flutter_hooksとRiverpodを併用する場合のパッケージ  |
-|Darthのみ（Flutterを使用しない）  |[riverpod](https://github.com/rrousselGit/riverpod/tree/master/packages/riverpod)  |Flutter関連のクラスを全て除いたRiverpodパッケージ  |
+|Dartのみ（Flutterを使用しない）  |[riverpod](https://github.com/rrousselGit/riverpod/tree/master/packages/riverpod)  |Flutter関連のクラスを全て除いたRiverpodパッケージ  |
 
 今回はFlutterで基本的なRiverpodの使い方を解説するだけなのでhooks_riverpodやriverpodは解説しません。flutter_riverpodのみを使用します。
 
@@ -640,7 +634,7 @@ typedef DioRef = AutoDisposeProviderRef<Dio>;
 ・Providerの生成
 ・引数に渡されるDioRefの型定義
 
-また、riverpod_generatarを使用するとデフォルトでautoDispose修飾子がついたProviderが生成されるようになっています。
+また、riverpod_generatorを使用するとデフォルトでautoDispose修飾子がついたProviderが生成されるようになっています。
 
 > 「Providerへの参照がなくなっても状態を保持したいのにriverpod_generatorを使うとデフォルトでautoDisposeされてしまう.... 」とお困りの方もいるかもしれません。そんな方は***keepAlive***を使う事で解決します。
 
@@ -655,9 +649,8 @@ Future<Post> fetchPost(FetchPostRef ref, int postId) {
 ```
 
 詳しくは下記をご覧ください。
-[How does keepAlive work?
-](https://codewithandrea.com/articles/flutter-riverpod-data-caching-providers-lifecycle/#how-does-keepalive-work?)
-:::
+
+[How does keepAlive work?](https://codewithandrea.com/articles/flutter-riverpod-data-caching-providers-lifecycle/#how-does-keepalive-work?)
 
 今回作成したサンプルアプリでは使用していないですが、riverpod_generatorを使うことによってfamily修飾子の欠点を補ってくれます。
 例えばfamily修飾子を使用して次のようなFutureProviderを作ったとします。
