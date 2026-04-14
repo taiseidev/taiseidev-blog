@@ -7,7 +7,15 @@ const socials = siteConfig.socialLinks.filter((s) => s.href)
 
 <BaseLayout title="about" description={`${siteConfig.author}について`}>
   <header class="mb-14">
-    <p class="text-xs tracking-[0.4em] uppercase text-muted mb-4">about</p>
+    <p class="text-xs tracking-[0.4em] uppercase text-muted mb-6">about</p>
+    <img
+      src="/images/profile.jpg"
+      alt={siteConfig.author}
+      width="96"
+      height="96"
+      class="w-24 h-24 rounded-full object-cover mb-5 opacity-95"
+      loading="eager"
+    />
     <h1 class="text-2xl font-500 tracking-wide leading-relaxed">
       {siteConfig.author}
     </h1>
