@@ -146,29 +146,40 @@ fun greet(name: String) = "Hello, $name"
 
 ## 4. photo カテゴリの書き方
 
-現在は専用UIがないので、**通常の Markdown + 画像** の形でそのまま書けます。
+photo カテゴリは、frontmatter の `photos:` に画像パスを並べるだけで、
+**自動でギャラリー表示**されます（本文にMarkdown画像を書く必要はありません）。
 
 ```md
 ---
 title: 2026 春の東京
 date: 2026-04-14
 category: photo
-image:
-  src: /images/2026-spring-tokyo/01.jpg
-  alt: 朝の神田川
+lang: ja-JP
+photos:
+  # 単なる画像パスだけならこの形式
+  - /images/2026-spring-tokyo/01.jpg
+  # キャプションを付けたい場合はオブジェクト形式で
+  - src: /images/2026-spring-tokyo/02.jpg
+    caption: 朝の神田川
+  - /images/2026-spring-tokyo/03.jpg
 ---
 
-朝の神田川沿いを歩いた。
-
-![](/images/2026-spring-tokyo/01.jpg)
-
-桜はすでに散り始めていた。
-
-![](/images/2026-spring-tokyo/02.jpg)
+本文を書きたい場合はここに書く。散歩の感想など。
+この本文はギャラリーの上に表示されます。
 ```
 
-1投稿に複数枚の写真を並べる形。将来的に一覧にサムネイル表示するなど、
-専用UIを足すことも可能。
+### ギャラリーの動作
+- 1カラム（モバイル）／ 2カラム（PC）の masonry 風レイアウト
+- 画像クリックで新規タブに原寸表示
+- 画像はアスペクト比そのまま、画質優先
+
+### 画像のリサイズ
+カメラ撮影の JPG は 1枚 5〜15MB と大きいので、アップ前に `sips` で縮小することを推奨:
+```bash
+sips -Z 2000 -s format jpeg -s formatOptions 85 input.jpg --out output.jpg
+```
+`-Z 2000` は最長辺を 2000px に制限、`formatOptions 85` は JPEG品質85。
+1枚 300KB〜1MB程度に収まります。
 
 ---
 
