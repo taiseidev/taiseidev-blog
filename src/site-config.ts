@@ -1,7 +1,6 @@
 export const siteConfig = {
   author: 'Taisei Onishi',
   title: 'taiseidev',
-  subtitle: '',
   description: '日々の仕事や趣味、考えごとを静かに残していく場所。',
   image: {
     src: '/main_image',
@@ -26,14 +25,6 @@ export const siteConfig = {
     navLinks: [
       { text: 'about', href: '/about' },
     ],
-  },
-  page: {
-    blogLinks: [
-      { text: 'Blog', href: '/blog' },
-    ],
-  },
-  footer: {
-    navLinks: [],
   },
 }
 
