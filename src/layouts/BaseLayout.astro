@@ -4,27 +4,31 @@ import { ViewTransitions } from 'astro:transitions'
 import BaseHead from '@/components/BaseHead.astro'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
-import ScrollToTop from '@/components/ScrollToTop.vue'
 
 const { ...head } = Astro.props
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="ja">
   <head>
     <BaseHead {...head} />
     <ViewTransitions />
     <meta name="google-site-verification" content="FZGfyptLUiTwzMoQFS-U4peZoVGfrZqwAkWQnERV6X4" />
   </head>
-  <body class="bg-main text-main min-h-screen font-sans w-full bg-dot">
-    <Header client:load />
-    <main
-      class="grow max-w-3xl mx-auto sm:pt-36 pt-26 pb-16 px-6 relative"
-      transition:animate={fade({ duration: '0.4s' })}
-    >
-      <slot />
-      <ScrollToTop client:load />
-      <Footer />
-    </main>
+  <body class="bg-main text-main min-h-screen font-serif w-full">
+    <div class="flex flex-col min-h-screen">
+      <div class="max-w-3xl w-full mx-auto px-6 sm:px-10">
+        <Header client:load />
+      </div>
+      <main
+        class="max-w-2xl w-full mx-auto px-6 sm:px-10 grow pt-10 pb-10"
+        transition:animate={fade({ duration: '0.3s' })}
+      >
+        <slot />
+      </main>
+      <div class="max-w-3xl w-full mx-auto px-6 sm:px-10">
+        <Footer />
+      </div>
+    </div>
   </body>
 </html>

@@ -1,91 +1,51 @@
 <script lang="ts" setup>
 import siteConfig from '@/site-config'
 import { getLinkTarget } from '@/utils/link'
-import { useWindowScroll } from '@vueuse/core'
-import { computed, onMounted, ref, unref } from 'vue'
+import { computed, ref } from 'vue'
 import ThemeToggle from './ThemeToggle.vue'
 
 const navLinks = siteConfig.header.navLinks || []
 
 const socialLinks = computed(() => {
   return siteConfig.socialLinks.filter((link: Record<string, any>) => {
-    if (link.header && typeof link.header === 'boolean') {
-      return link
-    }
-    else if (link.header && typeof link.header === 'string') {
+    if (link.header && typeof link.header === 'string') {
       link.icon = link.header.includes('i-') ? link.header : link.icon
       return link
     }
-    else {
-      return false
-    }
+    return false
   })
 })
 
-const { y: scroll } = useWindowScroll()
-
-const oldScroll = ref(unref(scroll))
-
-onMounted(() => {
-  const navMask = document.querySelector('.nav-drawer-mask') as HTMLElement
-
-  navMask?.addEventListener('touchmove', (event) => {
-    event.preventDefault()
-  })
-
-  const headerEl = document.querySelector('#header') as HTMLElement
-  if (!headerEl)
-    return
-
-  if (document.documentElement.scrollTop > 100)
-    headerEl.classList.add('header-bg-blur')
-
-  window.addEventListener('scroll', () => {
-    if (scroll.value < 150) {
-      headerEl.classList.remove('header-hide')
-      return
-    }
-
-    if (scroll.value - oldScroll.value > 150) {
-      headerEl.classList.add('header-hide')
-      oldScroll.value = scroll.value
-    }
-
-    if (oldScroll.value - scroll.value > 150) {
-      headerEl.classList.remove('header-hide')
-      oldScroll.value = scroll.value
-    }
-  })
-})
-
-function toggleNavDrawer() {
-  const drawer = document.querySelector('.nav-drawer') as HTMLElement
-  const mask = document.querySelector('.nav-drawer-mask') as HTMLElement
-  if (!drawer || !mask)
-    return
-  if (drawer.style.transform === `translateX(0%)`) {
-    drawer.style.transform = `translateX(-100%)`
-    mask.style.display = `none`
-  }
-  else {
-    drawer.style.transform = `translateX(0%)`
-    mask.style.display = `block`
-  }
+const drawerOpen = ref(false)
+function toggleDrawer() {
+  drawerOpen.value = !drawerOpen.value
 }
 </script>
 
 <template>
-  <header
-    id="header" :class="{ 'header-bg-blur': scroll > 20 }"
-    class="!fixed bg-transparent z-899 w-screen h-20 px-6 flex justify-between items-center relative"
-  >
-    <div class="flex items-center h-full">
-      <a href="/" class="text-2xl font-semibold tracking-wide text-primary hover:opacity-80 transition-opacity">
-        taiseidev
+  <header class="w-full pt-12 pb-8">
+    <div class="flex items-center justify-between gap-6">
+      <a
+        href="/"
+        class="group flex items-center gap-2 text-link hover:opacity-80 transition-opacity"
+      >
+        <svg
+          viewBox="10 10 44 44"
+          aria-hidden="true"
+          class="h-9 w-9 shrink-0 mt-[2px] transition-transform duration-500 ease-out group-hover:rotate-[60deg]"
+        >
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-linecap="round"
+            d="M 32 32 A 2 2 0 0 1 36 32 A 4 4 0 0 1 28 32 A 6 6 0 0 1 40 32 A 8 8 0 0 1 24 32 A 10 10 0 0 1 44 32 A 12 12 0 0 1 20 32"
+          />
+        </svg>
+        <span class="text-xl tracking-wide font-500">taiseidev</span>
       </a>
 
-      <!-- ロゴとナビの間にスペース（左マージン8 = 約2rem） -->
-      <nav class="sm:flex hidden flex-wrap gap-x-6 ml-8 position-initial flex-row">
+      <nav class="hidden sm:flex items-center gap-6 text-sm">
         <a
           v-for="link in navLinks"
           :key="link.text"
@@ -93,65 +53,69 @@ function toggleNavDrawer() {
           :target="getLinkTarget(link.href)"
           nav-link
           :href="link.href"
+          class="tracking-wider"
         >
           {{ link.text }}
         </a>
+        <span class="w-px h-3 bg-current opacity-20" />
+        <a
+          v-for="link in socialLinks"
+          :key="link.text"
+          :aria-label="link.text"
+          :class="link.icon"
+          nav-link
+          :target="getLinkTarget(link.href)"
+          :href="link.href"
+        />
+        <a
+          nav-link
+          target="_blank"
+          href="/rss.xml"
+          aria-label="RSS"
+          class="text-xs tracking-widest uppercase"
+        >
+          rss
+        </a>
+        <ThemeToggle />
       </nav>
 
-      <div sm:hidden h-full flex items-center @click="toggleNavDrawer()">
-        <menu i-ri-menu-2-fill />
-      </div>
+      <button
+        class="sm:hidden text-xs tracking-widest uppercase opacity-70 hover:opacity-100"
+        aria-label="menu"
+        @click="toggleDrawer()"
+      >
+        menu
+      </button>
     </div>
-    <div class="flex gap-x-6">
-      <a
-        v-for="link in socialLinks" :key="link.text" :aria-label="`${link.text}`" :class="link.icon" nav-link
-        :target="getLinkTarget(link.href)" :href="link.href"
-      />
 
-      <a nav-link target="_blank" href="/rss.xml" i-ri-rss-line aria-label="RSS" />
-      <ThemeToggle />
-    </div>
-  </header>
-  <nav
-    class="nav-drawer sm:hidden"
-  >
-    <i i-ri-menu-2-fill />
-    <a
-      v-for="link in navLinks" :key="link.text" :aria-label="`${link.text}`" :target="getLinkTarget(link.href)"
-      nav-link :href="link.href" @click="toggleNavDrawer()"
+    <!-- モバイル用ドロワー -->
+    <nav
+      v-show="drawerOpen"
+      class="sm:hidden mt-6 flex flex-col gap-3 text-sm"
     >
-      {{ link.text }}
-    </a>
-  </nav>
-  <div class="nav-drawer-mask" @click="toggleNavDrawer()" />
+      <a
+        v-for="link in navLinks"
+        :key="link.text"
+        :aria-label="link.text"
+        :target="getLinkTarget(link.href)"
+        nav-link
+        :href="link.href"
+        class="tracking-wider"
+        @click="toggleDrawer()"
+      >
+        {{ link.text }}
+      </a>
+      <a
+        nav-link
+        target="_blank"
+        href="/rss.xml"
+        class="text-xs tracking-widest uppercase"
+      >
+        rss
+      </a>
+    </nav>
+
+    <!-- hairline -->
+    <div class="mt-8 hairline" />
+  </header>
 </template>
-
-<style scoped>
-.header-hide {
-  transform: translateY(-100%);
-  transition: transform 0.4s ease;
-}
-
-.header-bg-blur {
-  --at-apply: backdrop-blur-sm;
-}
-
-.nav-drawer {
-  transform: translateX(-100%);
-  --at-apply: box-border fixed h-screen z-999 left-0 top-0 min-w-32vw max-w-50vw bg-main p-6 text-lg flex flex-col gap-5
-    transition-all;
-}
-
-.nav-drawer-mask {
-  display: none;
-  --at-apply: transition-all;
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 998;
-}
-</style>
