@@ -1,0 +1,81 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import siteConfig from '@/site-config'
+
+const socials = siteConfig.socialLinks.filter((s) => s.href)
+---
+
+<BaseLayout title="about" description={`${siteConfig.author}について`}>
+  <header class="mb-14">
+    <p class="text-xs tracking-[0.4em] uppercase text-muted mb-4">about</p>
+    <h1 class="text-2xl font-500 tracking-wide leading-relaxed">
+      {siteConfig.author}
+    </h1>
+  </header>
+
+  <section class="mb-16 space-y-6 text-[15px] leading-[2] tracking-wide">
+    <p>
+      はじめまして、{siteConfig.author}です。
+    </p>
+    <p>ふだんはモバイルアプリの開発を仕事にしていて、 FlutterやAndroid(Kotlin)まわりを触ることが多いです。</p>
+    <p>このブログは、仕事のことや趣味、日々の気づきなど、 カテゴリを問わず残していく個人的な手控えのようなものです。</p>
+  </section>
+
+  <div class="hairline mb-10"></div>
+
+  <section class="mb-16">
+    <h2 class="text-xs tracking-[0.3em] uppercase text-muted mb-6">— now</h2>
+    <ul class="space-y-3 text-[15px] leading-[2]">
+      <li class="flex gap-4">
+        <span class="text-muted w-20 shrink-0 text-xs tracking-widest uppercase pt-1"> work </span>
+        <span>モバイルアプリ開発</span>
+      </li>
+      <li class="flex gap-4">
+        <span class="text-muted w-20 shrink-0 text-xs tracking-widest uppercase pt-1"> reading </span>
+        <span>（最近読んでいる本）</span>
+      </li>
+      <li class="flex gap-4">
+        <span class="text-muted w-20 shrink-0 text-xs tracking-widest uppercase pt-1"> hobby </span>
+        <span>（趣味）</span>
+      </li>
+    </ul>
+  </section>
+
+  <div class="hairline mb-10"></div>
+
+  <section class="mb-16">
+    <h2 class="text-xs tracking-[0.3em] uppercase text-muted mb-6">— contact</h2>
+    <ul class="space-y-3 text-[15px]">
+      {
+        socials.map((s) => (
+          <li>
+            <a href={s.href} target="_blank" rel="noopener" class="nav-link inline-flex items-baseline gap-3">
+              <span class="text-muted text-xs tracking-widest uppercase w-20 shrink-0">{s.text}</span>
+              <span class="border-b border-current !border-op-30 hover:!border-op-70 transition-[border-color]">
+                {s.href.replace(/^https?:\/\//, '')}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+      {
+        siteConfig.email && (
+          <li>
+            <a href={`mailto:${siteConfig.email}`} class="nav-link inline-flex items-baseline gap-3">
+              <span class="text-muted text-xs tracking-widest uppercase w-20 shrink-0">email</span>
+              <span class="border-b border-current !border-op-30 hover:!border-op-70 transition-[border-color]">
+                {siteConfig.email}
+              </span>
+            </a>
+          </li>
+        )
+      }
+    </ul>
+  </section>
+
+  <div class="mt-20 mb-4 flex items-center justify-center gap-4 text-muted opacity-60">
+    <span class="h-px w-12 bg-current"></span>
+    <span class="text-xs tracking-[0.4em] uppercase">end</span>
+    <span class="h-px w-12 bg-current"></span>
+  </div>
+</BaseLayout>

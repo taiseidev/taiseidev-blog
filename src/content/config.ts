@@ -13,6 +13,9 @@ const pages = defineCollection({
   }),
 })
 
+export const categories = ['life', 'hobby', 'photo', 'tech'] as const
+export type Category = typeof categories[number]
+
 const blog = defineCollection({
   schema: z.object({
     title: z.string(),
@@ -32,6 +35,7 @@ const blog = defineCollection({
         month: 'short',
         day: 'numeric',
       })),
+    category: z.enum(categories).default('life'),
     draft: z.boolean().default(false).optional(),
     lang: z.string().default('en-US').optional(),
     tag: z.string().optional().optional(),
