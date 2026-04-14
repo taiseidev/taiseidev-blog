@@ -5,6 +5,7 @@ duration: 10min
 date: 2025-3-29
 lang: ja-JP
 draft: false
+category: tech
 tag: Kotlin,Kotest,自動テスト
 image:
   src: "/ogp/kotest-before-after.png"
