@@ -16,7 +16,3 @@ photos:
   - /images/kamakura-snap-photos/8.jpg
   - /images/kamakura-snap-photos/9.jpg
 ---
-
-春のはじまりを確かめに、鎌倉へ。
-坂道や路地、古い寺の境内で、桜が静かにほころびはじめていた。
-海から吹く風はまだ少し冷たくて、それでも歩くたびに、春が近づいているのを感じる一日だった。
