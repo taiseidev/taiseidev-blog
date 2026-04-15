@@ -80,7 +80,13 @@ const years = Object.keys(groupedByYear)
     {posts.length === 0 && <div class="py-24 text-center text-muted text-sm">まだ何も書かれていません。</div>}
   </div>
 
-  <div class="mt-20 mb-4 flex items-center justify-center gap-4 text-muted opacity-60">
+  <div class="mt-16 flex justify-center" data-more-wrapper style="display:none">
+    <button type="button" data-more class="more-btn">
+      <span class="text-xs tracking-[0.3em] uppercase">more</span>
+    </button>
+  </div>
+
+  <div class="mt-20 mb-4 flex items-center justify-center gap-4 text-muted opacity-60" data-end>
     <span class="h-px w-12 bg-current"></span>
     <span class="text-xs tracking-[0.4em] uppercase">end</span>
     <span class="h-px w-12 bg-current"></span>
@@ -123,32 +129,85 @@ const years = Object.keys(groupedByYear)
   .cat-btn.is-active::after {
     transform: scaleX(1);
   }
+
+  .more-btn {
+    position: relative;
+    padding: 0.4rem 0;
+    color: inherit;
+    opacity: 0.6;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    transition: opacity 0.2s ease;
+  }
+  .more-btn::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0.4);
+    transition: transform 0.25s ease;
+  }
+  .more-btn:hover {
+    opacity: 1;
+  }
+  .more-btn:hover::after {
+    transform: scaleX(1);
+  }
 </style>
 
 <script is:inline>
   ;(function () {
+    const INITIAL = 10
+    const STEP = 10
+
     function init() {
       const nav = document.querySelector('[data-filter]')
       const list = document.querySelector('[data-list]')
+      const moreWrapper = document.querySelector('[data-more-wrapper]')
+      const moreBtn = document.querySelector('[data-more]')
+      const endMark = document.querySelector('[data-end]')
       if (!nav || !list) {
         return
       }
 
       const params = new URLSearchParams(window.location.search)
-      const initial = params.get('cat') || 'all'
+      let currentCat = params.get('cat') || 'all'
+      let revealed = INITIAL
 
-      function apply(cat) {
-        list.querySelectorAll('.post-item').forEach((item) => {
-          const match = cat === 'all' || item.getAttribute('data-cat') === cat
-          item.style.display = match ? '' : 'none'
+      function apply() {
+        const items = list.querySelectorAll('.post-item')
+        let matchedIndex = 0
+        items.forEach((item) => {
+          const matches = currentCat === 'all' || item.getAttribute('data-cat') === currentCat
+          if (!matches) {
+            item.style.display = 'none'
+            return
+          }
+          item.style.display = matchedIndex < revealed ? '' : 'none'
+          matchedIndex++
         })
+        const totalMatching = matchedIndex
+
         list.querySelectorAll('.year-section').forEach((section) => {
           const visible = section.querySelectorAll('.post-item:not([style*="display: none"])')
           section.style.display = visible.length === 0 ? 'none' : ''
         })
+
         nav.querySelectorAll('.cat-btn').forEach((btn) => {
-          btn.classList.toggle('is-active', btn.getAttribute('data-cat') === cat)
+          btn.classList.toggle('is-active', btn.getAttribute('data-cat') === currentCat)
         })
+
+        const hasMore = totalMatching > revealed
+        if (moreWrapper) {
+          moreWrapper.style.display = hasMore ? '' : 'none'
+        }
+        if (endMark) {
+          endMark.style.display = hasMore ? 'none' : ''
+        }
       }
 
       nav.addEventListener('click', (e) => {
@@ -166,10 +225,19 @@ const years = Object.keys(groupedByYear)
           url.searchParams.delete('cat')
         }
         history.replaceState(null, '', url.toString())
-        apply(cat)
+        currentCat = cat
+        revealed = INITIAL
+        apply()
       })
 
-      apply(initial)
+      if (moreBtn) {
+        moreBtn.addEventListener('click', () => {
+          revealed += STEP
+          apply()
+        })
+      }
+
+      apply()
     }
 
     document.addEventListener('astro:page-load', init)
