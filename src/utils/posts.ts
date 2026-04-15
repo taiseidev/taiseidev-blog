@@ -11,8 +11,8 @@ export async function getPosts(path?: string, collection: PostKey = 'blog') {
   })).sort(sortPostsByDate)
 }
 
-export function calculateReadingTime(body: string): string {
-  const stripped = body
+export function calculateReadingTime(body: string | undefined): string {
+  const stripped = (body ?? '')
     .replace(/```[\s\S]*?```/g, '')
     .replace(/`[^`]*`/g, '')
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
