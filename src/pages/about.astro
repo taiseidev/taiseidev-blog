@@ -214,6 +214,8 @@ function coverOf(post: (typeof series)[number]) {
     border-top: 1px solid rgba(141, 137, 126, 0.2);
     padding: 2.75rem 0 3.5rem;
     display: grid;
+    /* minmax(0, …) がないと、フィルムストリップの内在幅にセクションが引き伸ばされて横はみ出しする */
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
   }
   @media (min-width: 768px) {

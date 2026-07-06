@@ -17,6 +17,8 @@ body {
   font-family: 'Noto Serif JP', 'Source Serif Pro', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
   font-feature-settings: 'palt';
   letter-spacing: 0.02em;
+  /* 横方向のはみ出しはページをスクロール・縮小可能にしてしまうので常に封じる */
+  overflow-x: clip;
 }
 
 .font-display {
