@@ -4,7 +4,7 @@ description: FlutterアプリでFirebase Authenticationを使ってメール・G
 duration: 15min
 date: 2023-7-2
 lang: ja-JP
-draft: false
+draft: true
 category: tech
 tag: Flutter, Firebase, Authentication
 ---

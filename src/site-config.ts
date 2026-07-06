@@ -1,7 +1,7 @@
 export const siteConfig = {
   author: 'Taisei Onishi',
   title: 'taiseidev',
-  description: '日々の仕事や趣味、考えごとを静かに残していく場所。',
+  description: '大西泰生の写真ポートフォリオ。散歩の途中で撮った街のスナップを、シリーズごとに。',
   image: {
     src: '/main_image',
     alt: 'Website Main Image',
@@ -9,10 +9,10 @@ export const siteConfig = {
   email: 'onishi.taisei1997@gmail.com',
   socialLinks: [
     {
-      text: 'GitHub',
-      href: 'https://github.com/taiseidev',
-      icon: 'i-simple-icons-github',
-      header: 'i-ri-github-line',
+      text: 'Instagram',
+      href: 'https://www.instagram.com/bytaisei/',
+      icon: 'i-simple-icons-instagram',
+      header: 'i-ri-instagram-line',
     },
     {
       text: 'X',
@@ -23,6 +23,7 @@ export const siteConfig = {
   ],
   header: {
     navLinks: [
+      { text: 'series', href: '/' },
       { text: 'about', href: '/about' },
     ],
   },

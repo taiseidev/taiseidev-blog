@@ -4,7 +4,7 @@ description: go_routerの基本的な使い方と、Navigator 1.0 / 2.0の違い
 duration: 15min
 date: 2023-2-5
 lang: ja-JP
-draft: false
+draft: true
 category: tech
 tag: Flutter, Dart, go_router
 ---

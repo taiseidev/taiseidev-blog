@@ -4,7 +4,7 @@ description: Android公式推奨のDIライブラリHiltの基本概念と、Vie
 duration: 13min
 date: 2023-11-18
 lang: ja-JP
-draft: false
+draft: true
 category: tech
 tag: Android, Kotlin, Hilt, DI
 ---

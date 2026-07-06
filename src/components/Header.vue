@@ -1,8 +1,12 @@
 <script lang="ts" setup>
 import siteConfig from '@/site-config'
 import { getLinkTarget } from '@/utils/link'
-import { computed, ref } from 'vue'
-import ThemeToggle from './ThemeToggle.vue'
+import { computed } from 'vue'
+
+defineProps<{
+  /** true でヒーロー写真の上に透過で重ねる（トップページ用） */
+  overlay?: boolean
+}>()
 
 const navLinks = siteConfig.header.navLinks || []
 
@@ -15,37 +19,25 @@ const socialLinks = computed(() => {
     return false
   })
 })
-
-const drawerOpen = ref(false)
-function toggleDrawer() {
-  drawerOpen.value = !drawerOpen.value
-}
 </script>
 
 <template>
-  <header class="w-full pt-12 pb-8">
-    <div class="flex items-center justify-between gap-6">
+  <header
+    class="w-full z-20"
+    :class="overlay ? 'absolute top-0 left-0 right-0' : ''"
+  >
+    <div class="max-w-5xl w-full mx-auto px-6 sm:px-10 pt-8 pb-6 flex items-center justify-between gap-6">
+      <!-- トップはヒーローに大きくブログ名が出るため、ロゴは重複させない -->
       <a
+        v-if="!overlay"
         href="/"
-        class="group flex items-center gap-2 text-link hover:opacity-80 transition-opacity"
+        class="font-display text-sm font-400 tracking-[0.4em] uppercase text-link hover:opacity-70 transition-opacity"
       >
-        <svg
-          viewBox="10 10 44 44"
-          aria-hidden="true"
-          class="h-9 w-9 shrink-0 mt-[2px] transition-transform duration-500 ease-out group-hover:rotate-[60deg]"
-        >
-          <path
-            fill="none"
-            stroke="currentColor"
-            stroke-width="3"
-            stroke-linecap="round"
-            d="M 32 32 A 2 2 0 0 1 36 32 A 4 4 0 0 1 28 32 A 6 6 0 0 1 40 32 A 8 8 0 0 1 24 32 A 10 10 0 0 1 44 32 A 12 12 0 0 1 20 32"
-          />
-        </svg>
-        <span class="text-xl tracking-wide font-500">taiseidev</span>
+        taiseidev
       </a>
+      <span v-else />
 
-      <nav class="hidden sm:flex items-center gap-6 text-sm">
+      <nav class="flex items-center gap-5 sm:gap-6">
         <a
           v-for="link in navLinks"
           :key="link.text"
@@ -53,7 +45,7 @@ function toggleDrawer() {
           :target="getLinkTarget(link.href)"
           nav-link
           :href="link.href"
-          class="tracking-wider"
+          class="font-display text-xs tracking-[0.25em] uppercase"
         >
           {{ link.text }}
         </a>
@@ -67,55 +59,7 @@ function toggleDrawer() {
           :target="getLinkTarget(link.href)"
           :href="link.href"
         />
-        <a
-          nav-link
-          target="_blank"
-          href="/rss.xml"
-          aria-label="RSS"
-          class="text-xs tracking-widest uppercase"
-        >
-          rss
-        </a>
-        <ThemeToggle />
       </nav>
-
-      <button
-        class="sm:hidden text-xs tracking-widest uppercase opacity-70 hover:opacity-100"
-        aria-label="menu"
-        @click="toggleDrawer()"
-      >
-        menu
-      </button>
     </div>
-
-    <!-- モバイル用ドロワー -->
-    <nav
-      v-show="drawerOpen"
-      class="sm:hidden mt-6 flex flex-col gap-3 text-sm"
-    >
-      <a
-        v-for="link in navLinks"
-        :key="link.text"
-        :aria-label="link.text"
-        :target="getLinkTarget(link.href)"
-        nav-link
-        :href="link.href"
-        class="tracking-wider"
-        @click="toggleDrawer()"
-      >
-        {{ link.text }}
-      </a>
-      <a
-        nav-link
-        target="_blank"
-        href="/rss.xml"
-        class="text-xs tracking-widest uppercase"
-      >
-        rss
-      </a>
-    </nav>
-
-    <!-- hairline -->
-    <div class="mt-8 hairline" />
   </header>
 </template>

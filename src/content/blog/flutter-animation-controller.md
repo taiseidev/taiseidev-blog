@@ -4,7 +4,7 @@ description: Flutterのアニメーションの基礎となるAnimationControlle
 duration: 15min
 date: 2023-5-20
 lang: ja-JP
-draft: false
+draft: true
 category: tech
 tag: Flutter, Dart, Animation
 ---

@@ -5,30 +5,47 @@ import BaseHead from '@/components/BaseHead.astro'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 
-const { ...head } = Astro.props
+type Props = {
+  title?: string
+  description?: string
+  image?: { src: string; alt?: string }
+  pageType?: 'website' | 'article'
+  /** default: 記事・固定ページ / wide: 写真シリーズ / full: トップ（全幅） */
+  width?: 'default' | 'wide' | 'full'
+  /** true でヘッダーをヒーロー写真の上に重ねる（トップ用） */
+  overlayHeader?: boolean
+}
+
+const { width = 'default', overlayHeader = false, ...head } = Astro.props
+
+const widthClass = {
+  default: 'max-w-3xl w-full mx-auto px-6 sm:px-10',
+  wide: 'max-w-5xl w-full mx-auto px-6 sm:px-10',
+  full: 'w-full',
+}[width]
 ---
 
 <!doctype html>
-<html lang="ja">
+<html lang="ja" class="dark">
   <head>
     <BaseHead {...head} />
     <ViewTransitions />
     <meta name="google-site-verification" content="FZGfyptLUiTwzMoQFS-U4peZoVGfrZqwAkWQnERV6X4" />
+    <script is:inline>
+      // JS が動く環境でだけスクロールリビール用の初期非表示を有効にする
+      document.documentElement.classList.add('js')
+    </script>
   </head>
   <body class="bg-main text-main min-h-screen font-serif w-full">
     <div class="flex flex-col min-h-screen">
-      <div class="max-w-3xl w-full mx-auto px-6 sm:px-10">
-        <Header client:load />
-      </div>
+      <Header client:load overlay={overlayHeader} />
       <main
-        class="max-w-3xl w-full mx-auto px-6 sm:px-10 grow pt-10 pb-10"
+        class:list={[widthClass, 'grow', overlayHeader ? '' : 'pt-6 pb-10']}
         transition:animate={fade({ duration: '0.3s' })}
       >
         <slot />
       </main>
-      <div class="max-w-3xl w-full mx-auto px-6 sm:px-10">
-        <Footer />
-      </div>
+      <Footer />
     </div>
 
     <button type="button" class="scroll-top" data-scroll-top aria-label="ページの上に戻る" hidden>
@@ -48,6 +65,70 @@ const { ...head } = Astro.props
     </button>
 
     <style is:global>
+      /* ─── Custom cursor ─── */
+      html.custom-cursor,
+      html.custom-cursor * {
+        cursor: none !important;
+      }
+      .cursor-dot,
+      .cursor-ring {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 2000;
+        pointer-events: none;
+        border-radius: 999px;
+        mix-blend-mode: difference;
+        opacity: 0;
+      }
+      .cursor-dot {
+        width: 6px;
+        height: 6px;
+        background: #e0dcd3;
+        transition: opacity 0.3s ease;
+      }
+      .cursor-ring {
+        width: 36px;
+        height: 36px;
+        border: 1px solid rgba(224, 220, 211, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          opacity 0.3s ease,
+          width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+          height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+          border-color 0.3s ease;
+      }
+      .cursor-dot.is-active,
+      .cursor-ring.is-active {
+        opacity: 1;
+      }
+      .cursor-ring.is-hover {
+        width: 52px;
+        height: 52px;
+        border-color: rgba(224, 220, 211, 0.5);
+      }
+      .cursor-ring.is-view {
+        width: 84px;
+        height: 84px;
+        border-color: rgba(224, 220, 211, 0.35);
+      }
+      .cursor-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px;
+        font-weight: 400;
+        letter-spacing: 0.3em;
+        text-indent: 0.3em;
+        text-transform: uppercase;
+        color: #e0dcd3;
+        opacity: 0;
+        transition: opacity 0.25s ease 0.1s;
+      }
+      .cursor-ring.is-view .cursor-label {
+        opacity: 1;
+      }
+
       .scroll-top {
         position: fixed;
         right: 1.5rem;
@@ -58,9 +139,9 @@ const { ...head } = Astro.props
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--scroll-top-bg, rgba(250, 250, 247, 0.85));
+        background: rgba(15, 14, 12, 0.8);
         color: inherit;
-        border: 1px solid rgba(125, 125, 125, 0.25);
+        border: 1px solid rgba(141, 137, 126, 0.3);
         border-radius: 999px;
         cursor: pointer;
         opacity: 0;
@@ -71,9 +152,6 @@ const { ...head } = Astro.props
           border-color 0.2s ease;
         backdrop-filter: blur(6px);
       }
-      html.dark .scroll-top {
-        background: rgba(26, 25, 22, 0.8);
-      }
       .scroll-top[hidden] {
         display: none;
       }
@@ -83,7 +161,7 @@ const { ...head } = Astro.props
       }
       .scroll-top:hover {
         opacity: 1;
-        border-color: rgba(125, 125, 125, 0.55);
+        border-color: rgba(141, 137, 126, 0.6);
       }
       @media (max-width: 640px) {
         .scroll-top {
@@ -129,6 +207,134 @@ const { ...head } = Astro.props
           return
         }
         init()
+      })()
+    </script>
+
+    <script is:inline>
+      // [data-reveal] 要素をスクロールに合わせてふわっと表示する
+      ;(function () {
+        function init() {
+          const els = document.querySelectorAll('[data-reveal]:not(.is-revealed)')
+          if (els.length === 0) {
+            return
+          }
+          const io = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('is-revealed')
+                  io.unobserve(entry.target)
+                }
+              })
+            },
+            { threshold: 0.1, rootMargin: '0px 0px -5% 0px' },
+          )
+          els.forEach((el) => io.observe(el))
+        }
+
+        // ページ遷移直後は View Transition のモーフを邪魔しないよう、
+        // 画面内の要素を即座に表示済みにする
+        document.addEventListener('astro:after-swap', () => {
+          document.querySelectorAll('[data-reveal]').forEach((el) => {
+            const rect = el.getBoundingClientRect()
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+              el.classList.add('is-revealed')
+            }
+          })
+        })
+
+        document.addEventListener('astro:page-load', init)
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', init)
+          return
+        }
+        init()
+      })()
+    </script>
+
+    <script is:inline>
+      // 遅れて追従するカスタムカーソル（ドット＋リング）
+      // マウス環境のみ。reduced-motion 時はネイティブカーソルのまま
+      ;(function () {
+        if (window.__cursorInit) {
+          return
+        }
+        window.__cursorInit = true
+
+        const fine = window.matchMedia('(pointer: fine)').matches
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (!fine || reduced) {
+          return
+        }
+
+        const dot = document.createElement('div')
+        dot.className = 'cursor-dot'
+        dot.setAttribute('aria-hidden', 'true')
+
+        const ring = document.createElement('div')
+        ring.className = 'cursor-ring'
+        ring.setAttribute('aria-hidden', 'true')
+
+        const label = document.createElement('span')
+        label.className = 'cursor-label'
+        label.textContent = 'view'
+        ring.appendChild(label)
+
+        function mount() {
+          document.body.appendChild(dot)
+          document.body.appendChild(ring)
+        }
+        mount()
+        document.documentElement.classList.add('custom-cursor')
+
+        let mouseX = window.innerWidth / 2
+        let mouseY = window.innerHeight / 2
+        let ringX = mouseX
+        let ringY = mouseY
+        let visible = false
+
+        window.addEventListener(
+          'mousemove',
+          (e) => {
+            mouseX = e.clientX
+            mouseY = e.clientY
+            if (!visible) {
+              visible = true
+              ringX = mouseX
+              ringY = mouseY
+              dot.classList.add('is-active')
+              ring.classList.add('is-active')
+            }
+          },
+          { passive: true },
+        )
+
+        document.documentElement.addEventListener('mouseleave', () => {
+          visible = false
+          dot.classList.remove('is-active')
+          ring.classList.remove('is-active')
+        })
+
+        // ホバー対象の判定はイベント委譲（ページ遷移後も張り直し不要）
+        document.addEventListener('mouseover', (e) => {
+          const target = e.target instanceof Element ? e.target : null
+          const view = target?.closest('.gallery-item, .wall-item a, .lightbox-img')
+          const interactive = !view && target?.closest('a, button, [role="button"], summary, input, textarea')
+          ring.classList.toggle('is-view', !!view)
+          ring.classList.toggle('is-hover', !!interactive)
+        })
+
+        function frame() {
+          ringX += (mouseX - ringX) * 0.14
+          ringY += (mouseY - ringY) * 0.14
+          dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`
+          ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`
+          requestAnimationFrame(frame)
+        }
+        requestAnimationFrame(frame)
+
+        // View Transitions で body が入れ替わったら要素を付け直す
+        document.addEventListener('astro:after-swap', mount)
       })()
     </script>
   </body>

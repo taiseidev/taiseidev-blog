@@ -4,7 +4,7 @@ description: Jetpack ComposeのModifierは適用順序によってUIの見た目
 duration: 20min
 date: 2025-4-19
 lang: ja-JP
-draft: false
+draft: true
 category: tech
 tag: Jetpack Compose,Modifier,Kotlin
 image:

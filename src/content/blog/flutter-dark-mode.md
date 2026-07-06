@@ -4,7 +4,7 @@ description: FlutterのThemeDataを使ってダークモードを実装する方
 duration: 12min
 date: 2023-4-8
 lang: ja-JP
-draft: false
+draft: true
 category: tech
 tag: Flutter, Dart, Theme
 ---

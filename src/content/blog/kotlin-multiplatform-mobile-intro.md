@@ -4,7 +4,7 @@ description: iOSとAndroidでビジネスロジックを共通化できるKotlin
 duration: 15min
 date: 2023-12-3
 lang: ja-JP
-draft: false
+draft: true
 category: tech
 tag: Kotlin, KMM, Multiplatform, iOS, Android
 ---

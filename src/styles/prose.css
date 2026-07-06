@@ -163,9 +163,6 @@
   padding: 1em 1.25em;
   border-radius: 4px;
   overflow-x: auto;
-  background: #f5f3ee;
-}
-html.dark .prose pre {
   background: #161513;
 }
 .prose pre code {
@@ -215,8 +212,5 @@ html.dark .prose pre {
 
 /* Shiki code highlighting tweaks */
 .prose .astro-code {
-  background: #f5f3ee !important;
-}
-html.dark .prose .astro-code {
   background: #161513 !important;
 }

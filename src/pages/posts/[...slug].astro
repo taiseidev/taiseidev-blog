@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { type CollectionPosts } from '@/types'
-import { calculateReadingTime, getPosts, getRelatedPosts } from '@/utils/posts'
+import { calculateReadingTime, getPosts } from '@/utils/posts'
 
 export async function getStaticPaths() {
   const posts = await getPosts()
@@ -12,7 +12,6 @@ export async function getStaticPaths() {
         post,
         prev: arr[i + 1] ?? null,
         next: arr[i - 1] ?? null,
-        related: getRelatedPosts(arr, post),
       },
     }
   })
@@ -22,17 +21,23 @@ type Props = {
   post: CollectionPosts
   prev: CollectionPosts | null
   next: CollectionPosts | null
-  related: CollectionPosts[]
 }
 
-const { post, prev, next, related } = Astro.props
+const { post, prev, next } = Astro.props
 const { title, image, description, date, duration, tag, category, photos } = post.data
 
 const { Content, headings } = await post.render()
 
+const isPhoto = category === 'photo'
 const readingTime = duration ?? calculateReadingTime(post.body)
 const tocHeadings = headings.filter((h) => h.depth === 2)
-const showToc = tocHeadings.length >= 2 && category !== 'photo'
+const showToc = tocHeadings.length >= 2 && !isPhoto
+
+// スラッグ（例: 20260329-nakameguro-snap）から地名のローマ字表記を取り出す
+const latinName = post.slug
+  .replace(/^\d+-/, '')
+  .replace(/-snap$/, '')
+  .replace(/-/g, ' ')
 
 function formatDate(d: string) {
   const dt = new Date(d)
@@ -47,16 +52,29 @@ function isoDate(d: string) {
 }
 ---
 
-<BaseLayout title={title} description={description} pageType="article">
-  <header class="mb-12">
-    <p class="text-xs tracking-[0.4em] uppercase text-muted mb-4">{category}</p>
+<BaseLayout title={title} description={description} pageType="article" width={isPhoto ? 'wide' : 'default'}>
+  <header class:list={['mb-12', isPhoto && 'pt-10 mb-16 text-center']}>
+    {isPhoto ? <p class="eyebrow mb-5">{latinName}</p> : <p class="eyebrow mb-4">{category}</p>}
     <h1 class="text-2xl sm:text-3xl font-500 tracking-wide leading-relaxed mb-6">
       {title}
     </h1>
-    <div class="flex items-baseline gap-2 text-xs text-muted tracking-widest uppercase">
+    <div
+      class:list={[
+        'font-display flex items-baseline gap-2 text-xs text-muted tracking-[0.2em] uppercase',
+        isPhoto && 'justify-center',
+      ]}
+    >
       {date && <time datetime={isoDate(date)}>{formatDate(date)}</time>}
       {
-        readingTime && category !== 'photo' && (
+        isPhoto && photos && (
+          <>
+            <span class="opacity-40">·</span>
+            <span>{photos.length} photos</span>
+          </>
+        )
+      }
+      {
+        !isPhoto && readingTime && (
           <>
             <span class="opacity-40">·</span>
             <span>{readingTime}</span>
@@ -67,7 +85,7 @@ function isoDate(d: string) {
         tag && (
           <>
             <span class="opacity-40">·</span>
-            <span class="normal-case tracking-normal">{tag}</span>
+            <span class="normal-case tracking-normal font-serif">{tag}</span>
           </>
         )
       }
@@ -94,13 +112,9 @@ function isoDate(d: string) {
     )
   }
 
-  {
-    image && category !== 'photo' && (
-      <img src={image.src} alt={image.alt || ''} class="w-full h-auto mb-10 rounded-sm" loading="eager" />
-    )
-  }
+  {image && !isPhoto && <img src={image.src} alt={image.alt || ''} class="w-full h-auto mb-10" loading="eager" />}
 
-  <article class="prose">
+  <article class:list={isPhoto ? 'photo-article' : 'prose'}>
     <Content />
     {
       photos && photos.length > 0 && (
@@ -114,9 +128,16 @@ function isoDate(d: string) {
                 rel="noopener"
                 class="gallery-item"
                 data-index={i}
+                data-reveal
+                style={`--reveal-delay: ${(i % 4) * 90}ms`}
                 aria-label={`写真 ${i + 1}`}
               >
-                <img src={photo.src} alt={photo.alt || ''} loading="lazy" />
+                {/* 1枚目はトップのカバーからモーフしてくる */}
+                {i === 0 ? (
+                  <img src={photo.src} alt={photo.alt || ''} loading="eager" transition:name={`series-${post.slug}`} />
+                ) : (
+                  <img src={photo.src} alt={photo.alt || ''} loading="lazy" />
+                )}
               </a>
             )
           })}
@@ -126,35 +147,11 @@ function isoDate(d: string) {
   </article>
 
   {
-    related.length > 0 && (
-      <section class="related mt-20 pt-8 border-t border-main !border-op-50">
-        <h2 class="text-xs tracking-[0.3em] uppercase text-muted mb-6">— related</h2>
-        <ul class="flex flex-col">
-          {related.map((r) => (
-            <li class="related-item border-t border-main !border-op-50 first:border-t-0">
-              <a href={`/posts/${r.slug}`} class="block py-4 group" aria-label={r.data.title}>
-                <div class="flex items-baseline gap-2 text-xs text-muted mb-1 tracking-widest uppercase">
-                  <time datetime={isoDate(r.data.date)}>{formatDate(r.data.date)}</time>
-                  <span class="opacity-40">·</span>
-                  <span>{r.data.category}</span>
-                </div>
-                <span class="block text-[15px] leading-relaxed group-hover:opacity-70 transition-opacity">
-                  {r.data.title}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-  }
-
-  {
     (prev || next) && (
-      <nav class="post-nav mt-16 pt-8 border-t border-main !border-op-50 flex justify-between gap-6 text-sm">
+      <nav class="post-nav mt-20 pt-8 hairline flex justify-between gap-6 text-sm">
         {prev ? (
           <a href={`/posts/${prev.slug}`} class="post-nav-link group flex flex-col items-start gap-1 max-w-[45%]">
-            <span class="text-xs tracking-widest uppercase text-muted">← older</span>
+            <span class="font-display text-xs tracking-[0.25em] uppercase text-muted">← older</span>
             <span class="text-[15px] leading-relaxed group-hover:opacity-70 transition-opacity">{prev.data.title}</span>
           </a>
         ) : (
@@ -165,7 +162,7 @@ function isoDate(d: string) {
             href={`/posts/${next.slug}`}
             class="post-nav-link group flex flex-col items-end text-right gap-1 max-w-[45%]"
           >
-            <span class="text-xs tracking-widest uppercase text-muted">newer →</span>
+            <span class="font-display text-xs tracking-[0.25em] uppercase text-muted">newer →</span>
             <span class="text-[15px] leading-relaxed group-hover:opacity-70 transition-opacity">{next.data.title}</span>
           </a>
         ) : (
@@ -355,38 +352,31 @@ function isoDate(d: string) {
 </script>
 
 <style is:global>
+  .photo-article {
+    margin-bottom: 4rem;
+  }
+
   .gallery {
     column-count: 1;
-    column-gap: 0.5rem;
+    column-gap: 0.75rem;
   }
   @media (min-width: 640px) {
     .gallery {
       column-count: 2;
     }
   }
-  @media (min-width: 768px) {
-    .gallery {
-      margin-left: -3rem;
-      margin-right: -3rem;
-    }
-  }
-  @media (min-width: 1024px) {
-    .gallery {
-      margin-left: -6rem;
-      margin-right: -6rem;
-    }
-  }
   .gallery .gallery-item {
     display: block;
-    margin: 0 0 0.5rem 0 !important;
+    margin: 0 0 0.75rem 0 !important;
     padding: 0 !important;
     border: 0 !important;
     text-decoration: none !important;
-    transition: opacity 0.25s ease;
+    transition: filter 0.3s ease;
     break-inside: avoid;
+    filter: brightness(0.94);
   }
   .gallery .gallery-item:hover {
-    opacity: 0.85;
+    filter: brightness(1);
     border: 0 !important;
   }
   .gallery .gallery-item img {
@@ -405,7 +395,7 @@ function isoDate(d: string) {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(10, 9, 8, 0.94);
+    background: rgba(10, 9, 8, 0.96);
     backdrop-filter: blur(4px);
     padding: 2rem 4rem;
     animation: lightbox-fade 0.2s ease-out;
@@ -466,7 +456,7 @@ function isoDate(d: string) {
     color: #a8a5a0;
     font-size: 0.75rem;
     letter-spacing: 0.2em;
-    font-family: inherit;
+    font-family: 'Jost', sans-serif;
   }
   @media (max-width: 640px) {
     .lightbox {
@@ -482,8 +472,8 @@ function isoDate(d: string) {
 
   /* ─── TOC ─── */
   .toc {
-    border-top: 1px solid rgba(125, 125, 125, 0.25);
-    border-bottom: 1px solid rgba(125, 125, 125, 0.25);
+    border-top: 1px solid rgba(141, 137, 126, 0.25);
+    border-bottom: 1px solid rgba(141, 137, 126, 0.25);
   }
   .toc-summary {
     list-style: none;
@@ -495,7 +485,7 @@ function isoDate(d: string) {
     font-size: 0.7rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: var(--prose-muted, #8a8780);
+    color: #8d897e;
     user-select: none;
   }
   .toc-summary::-webkit-details-marker {
@@ -547,7 +537,7 @@ function isoDate(d: string) {
     top: 0.5rem;
     right: 0.5rem;
     background: transparent;
-    border: 1px solid rgba(125, 125, 125, 0.25);
+    border: 1px solid rgba(141, 137, 126, 0.25);
     color: inherit;
     font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.65rem;
@@ -567,7 +557,7 @@ function isoDate(d: string) {
   }
   .copy-btn:hover {
     opacity: 1 !important;
-    border-color: rgba(125, 125, 125, 0.6);
+    border-color: rgba(141, 137, 126, 0.6);
   }
   .copy-btn.is-copied {
     opacity: 1 !important;

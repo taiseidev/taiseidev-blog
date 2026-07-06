@@ -1,18 +1,15 @@
-html.dark .astro-code,
-html.dark .astro-code span {
+html {
+  color-scheme: dark;
+  background-color: #0f0e0c;
+}
+
+.astro-code,
+.astro-code span {
   color: var(--shiki-dark) !important;
-  background-color: #161b22 !important;
+  background-color: #161513 !important;
   font-style: var(--shiki-dark-font-style) !important;
   font-weight: var(--shiki-dark-font-weight) !important;
   text-decoration: var(--shiki-dark-text-decoration) !important;
-}
-
-html.dark {
-  color-scheme: dark;
-}
-
-html:not(.dark) {
-  color-scheme: light;
 }
 
 html,
@@ -22,23 +19,23 @@ body {
   letter-spacing: 0.02em;
 }
 
+.font-display {
+  font-family: 'Jost', 'Futura', 'Avenir Next', sans-serif;
+}
+
 #nprogress {
   pointer-events: none;
 }
 
 #nprogress .bar {
-  background: #888;
-  opacity: 0.75;
+  background: #e0dcd3;
+  opacity: 0.5;
   position: fixed;
   z-index: 999;
   top: 0;
   left: 0;
   width: 100%;
-  height: 2px;
-}
-
-img {
-  --at-apply: rd-1.5;
+  height: 1px;
 }
 
 article {
@@ -47,6 +44,22 @@ article {
 
 .prose-link i {
   --at-apply: text-sm mr-1;
+}
+
+/* ─── Scroll reveal ─── */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-reveal] {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 1s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0s),
+      transform 1s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0s),
+      filter 0.3s ease 0s;
+  }
+  html.js [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 ::view-transition-old(root),
@@ -61,11 +74,4 @@ article {
 
 ::view-transition-new(root) {
   z-index: 2147483646;
-}
-
-html.dark::view-transition-old(root) {
-  z-index: 2147483646;
-}
-html.dark::view-transition-new(root) {
-  z-index: 1;
 }
